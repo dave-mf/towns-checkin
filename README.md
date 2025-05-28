@@ -10,21 +10,36 @@ Bot Telegram untuk mengingatkan check-in harian di aplikasi Towns. Bot ini akan 
 - 🎯 Pengingat pada jam yang sama dengan check-in terakhir setelah verify
 - 🔒 Keamanan dengan verifikasi user ID
 - 💾 Penyimpanan data streak secara lokal
+- 🌐 Tombol langsung ke website Towns
 
 ## Cara Penggunaan
 
-1. Jalankan bot dengan perintah:
+1. Clone repository ini:
+   ```bash
+   git clone https://github.com/username/towns-reminder-bot.git
+   cd towns-reminder-bot
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install python-telegram-bot
+   ```
+
+3. Konfigurasi bot:
+   - Buka `towns_reminder_bot.py`
+   - Update `BOT_TOKEN` dengan token bot Telegram Anda
+   - Update `USER_ID` dengan ID Telegram Anda
+
+4. Jalankan bot:
    ```bash
    python towns_reminder_bot.py
    ```
 
-2. Bot akan langsung mengirimkan pesan verify saat pertama kali dijalankan
-
-3. Klik tombol "✅ Verify" setiap kali Anda melakukan check-in di Towns
-
-4. Bot akan mengirimkan pengingat:
-   - Setiap 1 jam jika belum melakukan check-in hari ini
-   - Pada jam yang sama dengan check-in terakhir setelah verify
+5. Di Telegram:
+   - Mulai chat dengan bot Anda
+   - Kirim perintah `/start`
+   - Klik tombol "✅ Verify" setiap kali Anda melakukan check-in
+   - Klik tombol "🌐 Buka Towns" untuk langsung ke website
 
 ## Konfigurasi
 
@@ -41,41 +56,19 @@ Bot dapat dikonfigurasi dengan mengubah variabel berikut di `towns_reminder_bot.
 - Koneksi internet aktif
 - Token bot Telegram yang valid
 
-## Instalasi
-
-1. Clone repository ini
-2. Install dependencies:
-   ```bash
-   pip install python-telegram-bot
-   ```
-3. Update `BOT_TOKEN` dan `USER_ID` di `towns_reminder_bot.py`
-4. Jalankan bot
-
 ## Catatan
 
 - Bot akan menyimpan data streak di file `streak_data.json`
 - Pastikan bot memiliki akses untuk mengirim pesan ke chat Anda
 - Streak akan direset jika melewatkan check-in selama 24 jam
 
-## Troubleshooting
-- **PermissionError saat klik Verify:**
-  - Pastikan user yang menjalankan script punya izin menulis file di folder tersebut.
-  - Jika perlu, jalankan:
-    ```bash
-    touch streak_data.json
-    chmod 666 streak_data.json
-    ```
-- **Tidak ada notifikasi:**
-  - Pastikan sudah menjalankan `/start` di Telegram.
-  - Pastikan token dan user id sudah benar.
-  - Cek log terminal untuk error.
+## Kontribusi
 
-## Customisasi
-- Ubah interval reminder dengan mengedit variabel `REMINDER_INTERVAL` di script (dalam jam).
-- Untuk multi-user, perlu modifikasi script agar menyimpan data per user.
+Silakan buat pull request untuk kontribusi. Untuk perubahan besar, harap buka issue terlebih dahulu untuk mendiskusikan apa yang ingin Anda ubah.
 
 ## Lisensi
-Bebas digunakan dan dimodifikasi untuk keperluan pribadi.
+
+[MIT](https://choosealicense.com/licenses/mit/)
 
 ---
 

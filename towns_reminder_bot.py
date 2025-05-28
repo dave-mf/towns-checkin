@@ -97,8 +97,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data["streak"] = streak
     save_data(data)
     
-    msg = f"Streak kamu sekarang: {streak} hari berturut-turut!\nLangsung check-in di sini: https://app.towns.com"
-    await query.edit_message_text(msg)
+    # Buat keyboard dengan tombol untuk membuka website Towns
+    keyboard = [[InlineKeyboardButton("🌐 Buka Towns", url="https://app.towns.com")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    msg = f"Streak kamu sekarang: {streak} hari berturut-turut!\nKlik tombol di bawah untuk membuka Towns:"
+    await query.edit_message_text(msg, reply_markup=reply_markup)
 
 # Main
 if __name__ == "__main__":
