@@ -9,7 +9,7 @@ import asyncio
 BOT_TOKEN = "7886016775:AAEksvf5b7x16Xj1S5UM-gFBDJCW2xJlhWM"
 USER_ID = 842061413
 DATA_FILE = "streak_data.json"
-REMINDER_INTERVAL = 2  # Jam interval reminder
+DEFAULT_HOUR = 12  # Jam default jika belum pernah verify
 
 # Setup logging
 logging.basicConfig(
@@ -38,6 +38,22 @@ def is_verified_today():
         now = datetime.datetime.now()
         return last_time.date() == now.date()
     return False
+
+def get_next_reminder_time():
+    data = load_data()
+    last_checkin = data["last_checkin"]
+    now = datetime.datetime.now()
+    if last_checkin:
+        last_time = datetime.datetime.fromisoformat(last_checkin)
+        next_time = now.replace(hour=last_time.hour, minute=0, second=0, microsecond=0)
+        if now > next_time:
+            next_time += datetime.timedelta(days=1)
+        return next_time
+    else:
+        next_time = now.replace(hour=DEFAULT_HOUR, minute=0, second=0, microsecond=0)
+        if now > next_time:
+            next_time += datetime.timedelta(days=1)
+        return next_time
 
 # Fungsi reminder tiap 2 jam
 async def send_reminder(context: ContextTypes.DEFAULT_TYPE):
@@ -98,7 +114,7 @@ if __name__ == "__main__":
 
     # Inisialisasi job_queue
     job_queue = app.job_queue
-    # Reminder pertama dikirim 5 detik setelah bot start, lalu setiap 2 jam
-    job_queue.run_repeating(send_reminder, interval=REMINDER_INTERVAL*60*60, first=5)
+    next_time = get_next_reminder_time()
+    job_queue.run_daily(send_reminder, time=next_time.time(), days=(0,1,2,3,4,5,6))
 
     app.run_polling() 
