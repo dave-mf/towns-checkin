@@ -3,12 +3,14 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, JobQueue
 import datetime
 import json
+import pytz
 
 # Konfigurasi
 BOT_TOKEN = "7886016775:AAEksvf5b7x16Xj1S5UM-gFBDJCW2xJlhWM"
 USER_ID = 842061413
 DATA_FILE = "streak_data.json"
 REMINDER_INTERVAL = 1  # Jam interval reminder (jika belum verify)
+WIB = pytz.timezone('Asia/Jakarta')  # Timezone untuk WIB
 
 # Setup logging
 logging.basicConfig(
@@ -76,12 +78,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     data = load_data()
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(WIB)  # Gunakan waktu WIB
     last_checkin = data["last_checkin"]
     streak = data["streak"]
     
     if last_checkin:
-        last_time = datetime.datetime.fromisoformat(last_checkin)
+        last_time = datetime.datetime.fromisoformat(last_checkin).astimezone(WIB)
         delta = now - last_time
         if delta.total_seconds() <= 24*60*60 and last_time.date() == (now - datetime.timedelta(days=1)).date():
             streak += 1
@@ -97,11 +99,18 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data["streak"] = streak
     save_data(data)
     
+    # Hitung waktu check-in selanjutnya
+    next_checkin = now + datetime.timedelta(days=1)
+    next_checkin = next_checkin.replace(hour=now.hour, minute=now.minute, second=0, microsecond=0)
+    
+    # Format waktu dalam format Indonesia
+    next_checkin_str = next_checkin.strftime("%d %B %Y, %H:%M WIB")
+    
     # Buat keyboard dengan tombol untuk membuka website Towns
     keyboard = [[InlineKeyboardButton("🌐 Buka Towns", url="https://app.towns.com")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    msg = f"Streak kamu sekarang: {streak} hari berturut-turut!\nKlik tombol di bawah untuk membuka Towns:"
+    msg = f"Streak kamu sekarang: {streak} hari berturut-turut!\n\n⏰ Check-in selanjutnya pada:\n{next_checkin_str}\n\nKlik tombol di bawah untuk membuka Towns:"
     await query.edit_message_text(msg, reply_markup=reply_markup)
 
 # Main
@@ -119,7 +128,7 @@ if __name__ == "__main__":
     else:
         # Jika sudah verify, kirim reminder pada jam yang sama dengan verify terakhir
         data = load_data()
-        last_time = datetime.datetime.fromisoformat(data["last_checkin"])
+        last_time = datetime.datetime.fromisoformat(data["last_checkin"]).astimezone(WIB)
         next_time = datetime.datetime.now().replace(hour=last_time.hour, minute=0, second=0, microsecond=0)
         if datetime.datetime.now() > next_time:
             next_time += datetime.timedelta(days=1)
